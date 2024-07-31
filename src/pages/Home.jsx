@@ -9,7 +9,7 @@ const Home = () => {
       <Row className="mb-4">
         <Col>
           <Card className="text-center">
-            <Card.Header>Welcome to Masakali Cleaning Schedule</Card.Header>
+            <Card.Header>Welcome to Masakali Hygiene Tracker</Card.Header>
             <Card.Body>
               <Card.Title>Organize Your Cleaning Tasks Efficiently</Card.Title>
               <Card.Text>
