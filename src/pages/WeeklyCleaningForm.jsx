@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Container, Table, Form, Button, Modal } from 'react-bootstrap';
+import { Container, Table, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';

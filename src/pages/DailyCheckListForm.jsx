@@ -5,11 +5,12 @@ import { dailyChecklist } from '../data/data';
 import { db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { MultiSelect } from "react-multi-select-component";
 
 const DailyCheckList = () => {
   const [formState, setFormState] = useState(
     dailyChecklist.reduce((acc, item) => {
-      acc[item] = false;
+      acc[item] = { checked: false, selectedNames: [] };
       return acc;
     }, {})
   );
@@ -19,10 +20,32 @@ const DailyCheckList = () => {
   const [submittedDate, setSubmittedDate] = useState('');
   const navigate = useNavigate();
 
+  const options = [
+    { label: "Venkat", value: "Venkat" },
+    { label: "Ramu", value: "Ramu" },
+    { label: "Ashok", value: "Ashok" },
+    { label: "Ashini Kumar", value: "Ashini Kumar" },
+    { label: "Marwan", value: "Marwan" },
+    { label: "Imran", value: "Imran" }
+  ];
+
   const handleCheckboxChange = (item) => {
     setFormState((prevState) => ({
       ...prevState,
-      [item]: !prevState[item],
+      [item]: {
+        ...prevState[item],
+        checked: !prevState[item].checked,
+      },
+    }));
+  };
+
+  const handleSelectChange = (item, selected) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      [item]: {
+        ...prevState[item],
+        selectedNames: selected,
+      },
     }));
   };
 
@@ -34,8 +57,16 @@ const DailyCheckList = () => {
     e.preventDefault();
     const timestamp = serverTimestamp();
     try {
+      const formData = Object.keys(formState).reduce((acc, key) => {
+        acc[key] = {
+          checked: formState[key].checked,
+          selectedNames: formState[key].selectedNames.map((option) => option.value),
+        };
+        return acc;
+      }, {});
+
       await addDoc(collection(db, 'daily'), {
-        ...formState,
+        ...formData,
         name: name,
         timestamp,
       });
@@ -45,7 +76,7 @@ const DailyCheckList = () => {
       // Reset form after submission
       setFormState(
         dailyChecklist.reduce((acc, item) => {
-          acc[item] = false;
+          acc[item] = { checked: false, selectedNames: [] };
           return acc;
         }, {})
       );
@@ -69,17 +100,29 @@ const DailyCheckList = () => {
         <Card style={{ padding: '10px' }}>
           <Form onSubmit={handleSubmit}>
             {dailyChecklist.map((item, index) => (
-              <Form.Check
-                inline
-                label={item}
-                name="group1"
-                type="checkbox"
-                id={`checkbox-${index}`}
-                key={index}
-                checked={formState[item]}
-                onChange={() => handleCheckboxChange(item)}
-                style={{ margin: '10px' }}
-              />
+              <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <Form.Check
+                  inline
+                  label={item}
+                  name="group1"
+                  type="checkbox"
+                  id={`checkbox-${index}`}
+                  checked={formState[item].checked}
+                  onChange={() => handleCheckboxChange(item)}
+                  style={{ marginRight: '10px' }}
+                />
+                <MultiSelect
+                  options={options}
+                  value={formState[item].selectedNames}
+                  onChange={(selected) => handleSelectChange(item, selected)}
+                  labelledBy="Select"
+                  hasSelectAll={false}
+                  overrideStrings={{
+                    selectSomeItems: "Select Names",
+                    allItemsAreSelected: "All Selected",
+                  }}
+                />
+              </div>
             ))}
             <Form.Group controlId="formName">
               <Form.Label>Name</Form.Label>

@@ -15,6 +15,8 @@ const DailyCheckListData = () => {
         id: doc.id,
         ...doc.data(),
       }));
+      // Sort data by timestamp in descending order
+      data.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
       setDailyData(data);
     };
 
@@ -55,22 +57,28 @@ const DailyCheckListData = () => {
                     <th>#</th>
                     <th>Task</th>
                     <th>Status</th>
+                    <th>Names</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.keys(entry).filter(key => key !== 'id' && key !== 'name' && key !== 'timestamp').map((key, idx) => (
-                    <tr key={idx}>
-                      <td>{idx + 1}</td>
-                      <td>{key}</td>
-                      <td>
-                        <Form.Check
-                          type="checkbox"
-                          checked={entry[key]}
-                          readOnly
-                        />
-                      </td>
-                    </tr>
-                  ))}
+                  {Object.keys(entry)
+                    .filter(key => key !== 'id' && key !== 'name' && key !== 'timestamp')
+                    .map((key, idx) => (
+                      <tr key={idx}>
+                        <td>{idx + 1}</td>
+                        <td>{key}</td>
+                        <td>
+                          <Form.Check
+                            type="checkbox"
+                            checked={entry[key]?.checked || false}
+                            readOnly
+                          />
+                        </td>
+                        <td>
+                          {entry[key]?.selectedNames?.join(', ') || 'N/A'}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </Table>
             </Card.Body>
