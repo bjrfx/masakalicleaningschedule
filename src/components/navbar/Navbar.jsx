@@ -3,8 +3,9 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import Button from 'react-bootstrap/Button';
+// import Button from 'react-bootstrap/Button';
 import Logo from '../../assets/Logo.png';
+import { Link } from 'react-router-dom';
 
 function NavigationBar({ toggleTheme, theme }) {
   return (
@@ -16,11 +17,11 @@ function NavigationBar({ toggleTheme, theme }) {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="/dailyCheckList">Daily Checklist Form</Nav.Link>
-            <Nav.Link href="/weeklyCleaningForm">Weekly Cleaning Form</Nav.Link>
+            <Nav.Link as={Link} to='/dailyCheckList' >Daily Checklist Form</Nav.Link>
+            <Nav.Link as={Link} to='/weeklyCleaningForm' >Weekly Cleaning Form</Nav.Link>
             <NavDropdown title="Data" id="basic-nav-dropdown">
-              <NavDropdown.Item href="/weeklyCleaningData">Weekly Cleaning Data</NavDropdown.Item>
-              <NavDropdown.Item href="/dailyCheckListData">Daily Checklist Data</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to='/weeklyCleaningData'>Weekly Cleaning Data</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to='/dailyCheckListData' >Daily Checklist Data</NavDropdown.Item>
             </NavDropdown>
           </Nav>
           {/* <Button variant="outline-light" onClick={toggleTheme}>
