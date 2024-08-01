@@ -16,7 +16,6 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
   const [modalMessage, setModalMessage] = useState('');
   const navigate = useNavigate();
 
-  // Assignees with emails
   const options = [
     { label: "Venkat", value: "Venkat", email: "kiran.bjrfx1@gmail.com" },
     { label: "Ramu", value: "Ramu", email: "kiran.bjrfx1@gmail.com" },
@@ -35,12 +34,9 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
     }));
   };
 
-  // Function to send emails to assignees
   const sendEmail = async (recipients, taskName) => {
-    console.log('Sending email to:', recipients);
-    console.log('Task:', taskName);
-    
     try {
+      console.log('Sending email with recipients:', recipients, 'and task:', taskName);
       const response = await fetch('/send-email', {
         method: 'POST',
         headers: {
@@ -82,7 +78,7 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
       const collectionName = isWeekly ? 'weekly_tasks' : 'daily_tasks';
       for (const task of newSubmittedTasks) {
         await addDoc(collection(db, collectionName), task);
-        await sendEmail(task.emails, task.taskName);  // Send email to the assignees
+        await sendEmail(task.emails, task.taskName);
       }
       setModalMessage('Task Assigned');
       setShowModal(true);
