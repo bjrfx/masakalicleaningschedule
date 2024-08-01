@@ -37,6 +37,9 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
 
   // Function to send emails to assignees
   const sendEmail = async (recipients, taskName) => {
+    console.log('Sending email to:', recipients);
+    console.log('Task:', taskName);
+    
     try {
       const response = await fetch('/send-email', {
         method: 'POST',
