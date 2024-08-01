@@ -16,13 +16,14 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
   const [modalMessage, setModalMessage] = useState('');
   const navigate = useNavigate();
 
+  // Assignees with emails
   const options = [
-    { label: "Venkat", value: "Venkat" },
-    { label: "Ramu", value: "Ramu" },
-    { label: "Ashok", value: "Ashok" },
-    { label: "Ashini Kumar", value: "Ashini Kumar" },
-    { label: "Marwan", value: "Marwan" },
-    { label: "Imran", value: "Imran" }
+    { label: "Venkat", value: "Venkat", email: "kiran.bjrfx1@gmail.com" },
+    { label: "Ramu", value: "Ramu", email: "kiran.bjrfx1@gmail.com" },
+    { label: "Ashok", value: "Ashok", email: "kiran.bjrfx1@gmail.com" },
+    { label: "Ashini Kumar", value: "Ashini Kumar", email: "kiran.bjrfx1@gmail.com" },
+    { label: "Marwan", value: "Marwan", email: "kiran.bjrfx1@gmail.com" },
+    { label: "Imran", value: "Imran", email: "kiran.bjrfx1@gmail.com" }
   ];
 
   const handleSelectChange = (task, selected) => {
@@ -34,6 +35,27 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
     }));
   };
 
+  // Function to send emails to assignees
+  const sendEmail = async (recipients, taskName) => {
+    try {
+      const response = await fetch('/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ recipients, taskName }),
+      });
+
+      if (response.ok) {
+        console.log('Email sent successfully');
+      } else {
+        console.error('Error sending email:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newSubmittedTasks = Object.keys(assignedTasks)
@@ -41,6 +63,7 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
       .map(task => ({
         taskName: task,
         assignees: assignedTasks[task].assignees.map(assignee => assignee.value),
+        emails: assignedTasks[task].assignees.map(assignee => options.find(opt => opt.value === assignee.value)?.email),
         isWeekly,
         completed: false,
         timestamp: serverTimestamp(),
@@ -56,6 +79,7 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
       const collectionName = isWeekly ? 'weekly_tasks' : 'daily_tasks';
       for (const task of newSubmittedTasks) {
         await addDoc(collection(db, collectionName), task);
+        await sendEmail(task.emails, task.taskName);  // Send email to the assignees
       }
       setModalMessage('Task Assigned');
       setShowModal(true);
