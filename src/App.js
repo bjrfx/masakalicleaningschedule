@@ -9,6 +9,7 @@ import { Outlet } from 'react-router-dom';
 import WeeklyCleaningForm from './pages/WeeklyCleaningForm';
 import './App.css'; // Make sure to import the CSS file
 import Task from './components/task/Task';
+import TestMail from './components/Test/TestMail';
 const Layout = ({ toggleTheme, theme }) => (
   <div>
     <NavigationBar toggleTheme={toggleTheme} theme={theme} />
@@ -28,6 +29,7 @@ const App = () => {
         <Route path="/dailyCheckList" element={<DailyCheckList />} />
         <Route path="/dailyCheckListData" element={<DailyCheckListData />} />
         <Route path="/assignTask" element={<Task />} />
+        <Route path="/testMail" element={<TestMail />} />
       </Route>
     </Routes>
   );
