@@ -35,7 +35,6 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
     }));
   };
 
-  // Function to send emails to assignees
   const sendEmail = async (recipients, taskName) => {
     try {
       const response = await fetch('/send-email', {
@@ -43,7 +42,7 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ recipients, taskName }),
+        body: JSON.stringify({ recipients, taskName, recipientNames: recipients.map(r => options.find(o => o.email === r)?.label) }),
       });
 
       if (response.ok) {
