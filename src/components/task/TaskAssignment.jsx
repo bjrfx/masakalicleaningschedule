@@ -18,12 +18,12 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
 
   // Assignees with emails
   const options = [
-    { label: "Venkat", value: "Venkat", email: "venkat@example.com" },
-    { label: "Ramu", value: "Ramu", email: "ramu@example.com" },
-    { label: "Ashok", value: "Ashok", email: "ashok@example.com" },
-    { label: "Ashini Kumar", value: "Ashini Kumar", email: "ashini.kumar@example.com" },
-    { label: "Marwan", value: "Marwan", email: "marwan@example.com" },
-    { label: "Imran", value: "Imran", email: "imran@example.com" }
+    { label: "Venkat", value: "Venkat", email: "kiran.bjrfx1@gmail.com" },
+    { label: "Ramu", value: "Ramu", email: "kiran.bjrfx1@gmail.com" },
+    { label: "Ashok", value: "Ashok", email: "kiran.bjrfx1@gmail.com" },
+    { label: "Ashini Kumar", value: "Ashini Kumar", email: "kiran.bjrfx1@gmail.com" },
+    { label: "Marwan", value: "Marwan", email: "kiran.bjrfx1@gmail.com" },
+    { label: "Imran", value: "Imran", email: "kiran.bjrfx1@gmail.com" }
   ];
 
   const handleSelectChange = (task, selected) => {
@@ -37,6 +37,9 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
 
   // Function to send emails to assignees
   const sendEmail = async (recipients, taskName) => {
+    console.log('Sending email to:', recipients);
+    console.log('Task:', taskName);
+    
     try {
       const response = await fetch('/send-email', {
         method: 'POST',
