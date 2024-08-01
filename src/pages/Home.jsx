@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, CloseButton, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { db } from '../firebase';
-import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, addDoc } from 'firebase/firestore';
 
 const Home = () => {
     const [dailyTasks, setDailyTasks] = useState([]);
@@ -62,6 +62,17 @@ const Home = () => {
         setWeeklyTasks(prev => prev.filter(t => t.id !== task.id));
     };
 
+    const handleCancelTask = async (task, isWeekly) => {
+        const collectionName = isWeekly ? 'weekly_tasks' : 'daily_tasks';
+
+        // Remove the task from the tasks collection (to hide the card)
+        await deleteDoc(doc(db, collectionName, task.id));
+
+        // Refresh the tasks
+        setDailyTasks(prev => prev.filter(t => t.id !== task.id));
+        setWeeklyTasks(prev => prev.filter(t => t.id !== task.id));
+    };
+
     return (
         <Container style={{ marginTop: '5%', marginBottom: '5%' }}>
             <Row className="mb-4">
@@ -85,6 +96,14 @@ const Home = () => {
                     {dailyTasks.map(task => (
                         <Col key={task.id} md={4} className="mb-4" style={{margin: '2%'}}>
                             <Card>
+                                <Card.Header className="d-flex justify-content-between align-items-center">
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={<Tooltip id={`tooltip-${task.id}`}>Cancel Task</Tooltip>}
+                                    >
+                                        <CloseButton onClick={() => handleCancelTask(task, false)} />
+                                    </OverlayTrigger>
+                                </Card.Header>
                                 <Card.Body>
                                     <Card.Title>{task.taskName}</Card.Title>
                                     <Card.Text>Assigned to: {task.assignees.join(', ')}</Card.Text>
@@ -102,11 +121,19 @@ const Home = () => {
                     {weeklyTasks.map(task => (
                         <Col key={task.id} md={4} className="mb-4" style={{margin: '2%'}}>
                             <Card>
+                                <Card.Header className="d-flex justify-content-between align-items-center">
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={<Tooltip id={`tooltip-${task.id}`}>Cancel Task</Tooltip>}
+                                    >
+                                        <CloseButton onClick={() => handleCancelTask(task, true)} />
+                                    </OverlayTrigger>
+                                </Card.Header>
                                 <Card.Body>
                                     <Card.Title>{task.taskName}</Card.Title>
                                     <Card.Text>Assigned to: {task.assignees.join(', ')}</Card.Text>
                                     <Button variant="danger" onClick={() => handleMarkAsIncomplete(task, true)}>Mark as Incomplete</Button>
-                                    <Button variant="success" onClick={() => handleMarkAsCompleted(task, true)} style={{ marginLeft: '10px' }}>Mark as Completed</Button>
+                                    <Button variant="success" onClick={() => handleMarkAsCompleted(task, true)} style={{ marginLeft: '10px'}}>Mark as Completed</Button>
                                 </Card.Body>
                             </Card>
                         </Col>

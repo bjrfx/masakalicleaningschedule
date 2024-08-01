@@ -1,17 +1,34 @@
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
 import { db } from '../../firebase';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
-const AssignedTasksCard = ({ taskName, assignees = [], isWeekly, id, onTaskUpdate }) => {
-
-  const handleDeleteTask = async () => {
+const AssignedTasksCard = ({ taskName, assignees, isWeekly, id }) => {
+  const handleMarkAsCompleted = async () => {
     try {
-      await deleteDoc(doc(db, isWeekly ? 'assigned_weekly_tasks' : 'assigned_daily_tasks', id));
-      onTaskUpdate(); // Update the UI after deletion
-      alert(`${taskName} has been removed.`);
+      await updateDoc(doc(db, isWeekly ? 'weekly_tasks' : 'daily_tasks', id), {
+        completed: true,
+      });
     } catch (e) {
-      console.error('Error deleting task: ', e);
+      console.error('Error marking task as completed: ', e);
+    }
+  };
+
+  const handleMarkAsIncomplete = async () => {
+    try {
+      await updateDoc(doc(db, isWeekly ? 'weekly_tasks' : 'daily_tasks', id), {
+        completed: false,
+      });
+    } catch (e) {
+      console.error('Error marking task as incomplete: ', e);
+    }
+  };
+
+  const handleCancelTask = async () => {
+    try {
+      await deleteDoc(doc(db, isWeekly ? 'weekly_tasks' : 'daily_tasks', id));
+    } catch (e) {
+      console.error('Error canceling task: ', e);
     }
   };
 
@@ -20,14 +37,17 @@ const AssignedTasksCard = ({ taskName, assignees = [], isWeekly, id, onTaskUpdat
       <Card.Body>
         <Card.Title>{taskName}</Card.Title>
         <Card.Text>
-          Assigned to: {assignees.length > 0 ? assignees.join(', ') : 'No assignees'}
+          Assigned to: {assignees.join(', ')}
         </Card.Text>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button variant="danger" onClick={handleDeleteTask}>
-            Incomplete
+          <Button variant="danger" onClick={handleMarkAsIncomplete}>
+            Mark as Incomplete
           </Button>
-          <Button variant="success" onClick={handleDeleteTask}>
+          <Button variant="success" onClick={handleMarkAsCompleted}>
             Mark as Completed
+          </Button>
+          <Button variant="secondary" onClick={handleCancelTask}>
+            Cancel Task
           </Button>
         </div>
       </Card.Body>
