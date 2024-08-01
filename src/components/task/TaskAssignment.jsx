@@ -18,11 +18,11 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
 
   // Assignees with emails
   const options = [
-    { label: "Venkat", value: "Venkat", email: "kiran.bjrfx1@gmail.com" },
     { label: "Ramu", value: "Ramu", email: "phanikiran1234@gmail.com" },
     { label: "Ashok", value: "Ashok", email: "kiran.bjrfx1@gmail.com" },
     { label: "Ashini Kumar", value: "Ashini Kumar", email: "kiran.bjrfx1@gmail.com" },
     { label: "Marwan", value: "Marwan", email: "kiran.bjrfx1@gmail.com" },
+    { label: "Venkat", value: "Venkat", email: "kiran.bjrfx1@gmail.com" },
     { label: "Imran", value: "Imran", email: "kiran.bjrfx1@gmail.com" }
   ];
 
