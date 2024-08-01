@@ -35,23 +35,23 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
     }));
   };
 
-  const sendEmail = async (recipients, taskName) => {
+  const sendEmail = async (recipientEmail, recipientName, taskName) => {
     try {
       const response = await fetch('/send-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ recipients, taskName, recipientNames: recipients.map(r => options.find(o => o.email === r)?.label) }),
+        body: JSON.stringify({ recipientEmail, recipientName, taskName }),
       });
 
       if (response.ok) {
-        console.log('Email sent successfully');
+        console.log(`Email sent successfully to ${recipientName}`);
       } else {
-        console.error('Error sending email:', await response.text());
+        console.error(`Error sending email to ${recipientName}:`, await response.text());
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error(`Error sending email to ${recipientName}:`, error);
     }
   };
 
@@ -78,7 +78,12 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
       const collectionName = isWeekly ? 'weekly_tasks' : 'daily_tasks';
       for (const task of newSubmittedTasks) {
         await addDoc(collection(db, collectionName), task);
-        await sendEmail(task.emails, task.taskName);  // Send email to the assignees
+
+        // Send personalized email to each assignee
+        task.emails.forEach((email, index) => {
+          const recipientName = assignedTasks[task.taskName].assignees[index].label;
+          sendEmail(email, recipientName, task.taskName);
+        });
       }
       setModalMessage('Task Assigned');
       setShowModal(true);
