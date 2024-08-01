@@ -36,13 +36,15 @@ const TaskAssignment = ({ tasks, taskName, isWeekly }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newSubmittedTasks = Object.keys(assignedTasks).filter(task => assignedTasks[task].assignees.length > 0).map(task => ({
-      taskName: task,
-      assignees: assignedTasks[task].assignees.map(assignee => assignee.value),
-      isWeekly,
-      completed: false,
-      timestamp: serverTimestamp(),
-    }));
+    const newSubmittedTasks = Object.keys(assignedTasks)
+      .filter(task => assignedTasks[task].assignees.length > 0)
+      .map(task => ({
+        taskName: task,
+        assignees: assignedTasks[task].assignees.map(assignee => assignee.value),
+        isWeekly,
+        completed: false,
+        timestamp: serverTimestamp(),
+      }));
 
     if (newSubmittedTasks.length === 0) {
       setModalMessage('Please assign at least one task to someone.');
