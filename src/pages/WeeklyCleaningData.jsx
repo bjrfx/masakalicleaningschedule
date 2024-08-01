@@ -3,7 +3,6 @@ import { Card, Container, Table, Form, FormControl, InputGroup } from 'react-boo
 import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import Tabs from '../components/Tabs/Tabs';
-import { days, cleaningDays } from '../data/data';
 
 const WeeklyCleaningData = () => {
   const [weeklyData, setWeeklyData] = useState([]);
@@ -27,7 +26,7 @@ const WeeklyCleaningData = () => {
   };
 
   const filteredData = weeklyData.filter(entry =>
-    (entry.name && entry.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (entry.taskName && entry.taskName.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (entry.timestamp && new Date(entry.timestamp.seconds * 1000).toLocaleDateString().includes(searchTerm))
   );
 
@@ -38,7 +37,7 @@ const WeeklyCleaningData = () => {
       <Container>
         <InputGroup className="mb-3">
           <FormControl
-            placeholder="Search by name or date"
+            placeholder="Search by task name or date"
             value={searchTerm}
             onChange={handleSearchChange}
           />
@@ -47,46 +46,28 @@ const WeeklyCleaningData = () => {
           <Card key={entry.id} style={{ marginBottom: '20px' }}>
             <Card.Header className="d-flex justify-content-between">
               <span>Weekly Cleaning Schedule | {entry.timestamp ? new Date(entry.timestamp.seconds * 1000).toLocaleDateString() : 'No Date'}</span>
-              <span>Submitted by: {entry.name}</span>
+              <span>Assigned to: {entry.assignees ? entry.assignees.join(', ') : 'N/A'}</span>
             </Card.Header>
             <Card.Body>
               <Table responsive>
                 <thead>
                   <tr>
-                    <th>#</th>
-                    {days.map((day, index) => (
-                      <th key={index}>{day}</th>
-                    ))}
+                    <th>Task</th>
+                    <th>Status</th>
+                    <th>Comment</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Task</td>
-                    {days.map((day, index) => (
-                      <td key={index}>
-                        {index < cleaningDays.length ? cleaningDays[index] : ''}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Status</td>
-                    {days.map((day, index) => (
-                      <td key={index}>
-                        <Form.Check
-                          type="checkbox"
-                          checked={entry[day]?.status === 'done'}
-                          readOnly
-                        />
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Comment</td>
-                    {days.map((day, index) => (
-                      <td key={index}>
-                        {entry[day]?.comment || ''}
-                      </td>
-                    ))}
+                    <td>{entry.taskName}</td>
+                    <td>
+                      <Form.Check
+                        type="checkbox"
+                        checked={entry.completed || false}
+                        readOnly
+                      />
+                    </td>
+                    <td>{entry.comment || 'No comment'}</td>
                   </tr>
                 </tbody>
               </Table>

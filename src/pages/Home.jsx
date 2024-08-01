@@ -1,33 +1,120 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import AccordianItems from '../components/accordian/AccordianItems';
-import { Link } from 'react-router-dom';
+import { db } from '../firebase';
+import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
 
 const Home = () => {
-  return (
-    <Container style={{ marginTop: '5%', marginBottom: '5%' }}>
-      <Row className="mb-4">
-        <Col>
-          <Card className="text-center">
-            <Card.Header>Welcome to Masakali Hygiene Tracker</Card.Header>
-            <Card.Body>
-              <Card.Title>Organize Your Cleaning Tasks Efficiently</Card.Title>
-              <Card.Text>
-                This application helps you manage daily and weekly cleaning tasks with ease. Navigate through the tabs to submit and view your cleaning schedules.
-              </Card.Text>
-              <Button variant="primary" as={Link} to="/weeklyCleaningForm" style={{margin: '20px'}}>Get Started with Weekly Cleaning</Button>
-              <Button variant="secondary" as={Link} to="/dailyCheckList" className="ml-2">Get Started with Daily Checklist</Button>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <AccordianItems />
-        </Col>
-      </Row>
-    </Container>
-  );
-}
+    const [dailyTasks, setDailyTasks] = useState([]);
+    const [weeklyTasks, setWeeklyTasks] = useState([]);
+
+    useEffect(() => {
+        const fetchTasks = async () => {
+            const dailySnapshot = await getDocs(collection(db, 'daily_tasks'));
+            const weeklySnapshot = await getDocs(collection(db, 'weekly_tasks'));
+
+            const dailyData = dailySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const weeklyData = weeklySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            setDailyTasks(dailyData);
+            setWeeklyTasks(weeklyData);
+        };
+
+        fetchTasks();
+    }, []);
+
+    const handleMarkAsCompleted = async (task, isWeekly) => {
+        const collectionName = isWeekly ? 'weekly_tasks' : 'daily_tasks';
+
+        // Add the task to the relevant completed collection
+        const completedCollection = isWeekly ? 'weekly' : 'daily';
+        await addDoc(collection(db, completedCollection), {
+            taskName: task.taskName,
+            assignees: task.assignees,
+            timestamp: new Date(),
+            completed: true,
+        });
+
+        // Remove the task from the tasks collection (to hide the card)
+        await deleteDoc(doc(db, collectionName, task.id));
+
+        // Refresh the tasks
+        setDailyTasks(prev => prev.filter(t => t.id !== task.id));
+        setWeeklyTasks(prev => prev.filter(t => t.id !== task.id));
+    };
+
+    const handleMarkAsIncomplete = async (task, isWeekly) => {
+        const collectionName = isWeekly ? 'weekly_tasks' : 'daily_tasks';
+
+        // Add the task to the relevant completed collection with completed status as false
+        const incompleteCollection = isWeekly ? 'weekly' : 'daily';
+        await addDoc(collection(db, incompleteCollection), {
+            taskName: task.taskName,
+            assignees: task.assignees,
+            timestamp: new Date(),
+            completed: false,
+        });
+
+        // Remove the task from the tasks collection (to hide the card)
+        await deleteDoc(doc(db, collectionName, task.id));
+
+        // Refresh the tasks
+        setDailyTasks(prev => prev.filter(t => t.id !== task.id));
+        setWeeklyTasks(prev => prev.filter(t => t.id !== task.id));
+    };
+
+    return (
+        <Container style={{ marginTop: '5%', marginBottom: '5%' }}>
+            <Row className="mb-4">
+                <Col>
+                    <Card className="text-center">
+                        <Card.Header>Welcome to Masakali Hygiene Tracker</Card.Header>
+                        <Card.Body>
+                            <Card.Title>Organize Your Cleaning Tasks Efficiently</Card.Title>
+                            <Card.Text>
+                                This application helps you manage daily and weekly cleaning tasks with ease. Navigate through the tabs to submit and view your cleaning schedules.
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+            <Card style={{marginBottom: '5%'}}>
+                <Card.Header>
+                    <h2>Assigned Daily Tasks</h2>
+                </Card.Header>
+                <Row>
+                    {dailyTasks.map(task => (
+                        <Col key={task.id} md={4} className="mb-4" style={{margin: '2%'}}>
+                            <Card>
+                                <Card.Body>
+                                    <Card.Title>{task.taskName}</Card.Title>
+                                    <Card.Text>Assigned to: {task.assignees.join(', ')}</Card.Text>
+                                    <Button variant="danger" onClick={() => handleMarkAsIncomplete(task, false)}>Mark as Incomplete</Button>
+                                    <Button variant="success" onClick={() => handleMarkAsCompleted(task, false)} style={{ marginLeft: '10px' }}>Mark as Completed</Button>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
+            </Card>
+            <Card>
+                <Card.Header> <h2>Assigned Weekly Tasks</h2></Card.Header>
+                <Row>
+                    {weeklyTasks.map(task => (
+                        <Col key={task.id} md={4} className="mb-4" style={{margin: '2%'}}>
+                            <Card>
+                                <Card.Body>
+                                    <Card.Title>{task.taskName}</Card.Title>
+                                    <Card.Text>Assigned to: {task.assignees.join(', ')}</Card.Text>
+                                    <Button variant="danger" onClick={() => handleMarkAsIncomplete(task, true)}>Mark as Incomplete</Button>
+                                    <Button variant="success" onClick={() => handleMarkAsCompleted(task, true)} style={{ marginLeft: '10px' }}>Mark as Completed</Button>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
+            </Card>
+        </Container>
+    );
+};
 
 export default Home;

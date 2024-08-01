@@ -28,8 +28,8 @@ const DailyCheckListData = () => {
   };
 
   const filteredData = dailyData.filter(entry =>
-    entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    new Date(entry.timestamp.seconds * 1000).toLocaleDateString().includes(searchTerm)
+    (entry.taskName && entry.taskName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (entry.timestamp && new Date(entry.timestamp.seconds * 1000).toLocaleDateString().includes(searchTerm))
   );
 
   return (
@@ -39,7 +39,7 @@ const DailyCheckListData = () => {
       <Container>
         <InputGroup className="mb-3">
           <FormControl
-            placeholder="Search by name or date"
+            placeholder="Search by task name or date"
             value={searchTerm}
             onChange={handleSearchChange}
           />
@@ -48,7 +48,7 @@ const DailyCheckListData = () => {
           <Card key={entry.id} style={{ marginBottom: '20px' }}>
             <Card.Header className="d-flex justify-content-between">
               <span>Date: {new Date(entry.timestamp.seconds * 1000).toLocaleDateString()}</span>
-              <span>Submitted by: {entry.name}</span>
+              <span>Assigned to: {entry.assignees ? entry.assignees.join(', ') : 'N/A'}</span>
             </Card.Header>
             <Card.Body>
               <Table responsive>
@@ -57,28 +57,20 @@ const DailyCheckListData = () => {
                     <th>#</th>
                     <th>Task</th>
                     <th>Status</th>
-                    <th>Names</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.keys(entry)
-                    .filter(key => key !== 'id' && key !== 'name' && key !== 'timestamp')
-                    .map((key, idx) => (
-                      <tr key={idx}>
-                        <td>{idx + 1}</td>
-                        <td>{key}</td>
-                        <td>
-                          <Form.Check
-                            type="checkbox"
-                            checked={entry[key]?.checked || false}
-                            readOnly
-                          />
-                        </td>
-                        <td>
-                          {entry[key]?.selectedNames?.join(', ') || 'N/A'}
-                        </td>
-                      </tr>
-                    ))}
+                  <tr>
+                    <td>1</td>
+                    <td>{entry.taskName}</td>
+                    <td>
+                      <Form.Check
+                        type="checkbox"
+                        checked={entry.completed || false}
+                        readOnly
+                      />
+                    </td>
+                  </tr>
                 </tbody>
               </Table>
             </Card.Body>

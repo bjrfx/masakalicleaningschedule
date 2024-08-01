@@ -8,7 +8,7 @@ import NavigationBar from './components/navbar/Navbar';
 import { Outlet } from 'react-router-dom';
 import WeeklyCleaningForm from './pages/WeeklyCleaningForm';
 import './App.css'; // Make sure to import the CSS file
-
+import Task from './components/task/Task';
 const Layout = ({ toggleTheme, theme }) => (
   <div>
     <NavigationBar toggleTheme={toggleTheme} theme={theme} />
@@ -17,24 +17,17 @@ const Layout = ({ toggleTheme, theme }) => (
 );
 
 const App = () => {
-  const [theme, setTheme] = useState('dark');
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
 
   return (
     <Routes>
-      <Route path="/" element={<Layout toggleTheme={toggleTheme} theme={theme} />}>
+      <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="/weeklyCleaningData" element={<WeeklyCleaningData />} />
         <Route path="/weeklyCleaningForm" element={<WeeklyCleaningForm />} />
         <Route path="/dailyCheckList" element={<DailyCheckList />} />
         <Route path="/dailyCheckListData" element={<DailyCheckListData />} />
+        <Route path="/assignTask" element={<Task />} />
       </Route>
     </Routes>
   );

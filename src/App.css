@@ -2,22 +2,3 @@
   max-height: 50px;
   margin-right: 10px;
 }
-
-:root {
-  --background-color: #ffffff;
-  --text-color: #000000;
-  --navbar-bg: #f8f9fa;
-  --card-bg: #ffffff;
-}
-
-[data-theme='dark'] {
-  --background-color: #343a40;
-  --text-color: #ffffff;
-  --navbar-bg: #212529;
-  --card-bg: #495057;
-}
-
-body {
-  background-color: var(--background-color);
-  color: var(--text-color);
-}
